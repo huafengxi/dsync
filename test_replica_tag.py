@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """test_replica_tag.py — unit tests for the replica-tag ownership rules
-( the tool itself is).
+(the rules themselves live in replica-tag.py's docstring).
 
 Covers:
 + topic/ clan (shared multi-subscriber mailbox — including
-  the position mailbox topic/dispatcher, task): envelopes via
+  the position mailbox topic/dispatcher): envelopes via
   ``from``, namespaced acks via the SUBSCRIBER's host, everything else
   UNKNOWN (a topic has no spec.host).
 + namespaced ack ownership (protocol §4.6 two-state acks, t-3yp9③):
@@ -24,7 +24,7 @@ Covers:
   mis-attribution that tagged the hub's own release records as replica
   for every task registered on another machine.
 + hub = dev (was stale nv1), run/agentd.<H>.lock (locks moved under
-  run/ in task), gc/** -> hub.
+  run/), gc/** -> hub.
 + unchanged legacy behavior (task-dir classes, participant/ & ticket/
   pre-split layouts, from=agentd via body taskId, UNKNOWN conservatism).
 + end-to-end --apply in a temp tree (skipped when this machine has no

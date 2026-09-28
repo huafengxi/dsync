@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """gc.py — GC delete-list tool: explicit deletion propagation for the
-no---delete star sync mesh .
+no---delete star sync mesh.
 
 Background
 ==========
@@ -175,12 +175,12 @@ STATE_REL = os.path.join("run", "gc", "state.json")
 
 DEFAULT_DELAY = 300.0  # seconds; see module docstring for rationale
 
-# Iron rule (layout era; bot era
-# bot/ removed by user decision 2026-09-06): the typed
+# Iron rule (the bot/ clan's immortality was removed by user decision
+# 2026-09-06): the typed
 # layout subtree bot/ is NO LONGER immortal — it is deletable through
 # the gc channel like task/ and topic/ (all three clans are ephemeral
-# or explicitly-ruled purgeable; topic = collaboration containers
-#). The tuple stays as the mechanism for listing any
+# or explicitly-ruled purgeable; topic = collaboration containers).
+# The tuple stays as the mechanism for listing any
 # future cleanup-exempt clan (with the audited --force bypass below).
 # Critical single assets stay protected via PROTECTED_SYSTEM_PATHS.
 # HUB-SIDE ONLY defense.

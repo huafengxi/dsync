@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
-"""test_gc.py — unit tests for the GC delete-list mechanism
-().
+"""test_gc.py — unit tests for the GC delete-list mechanism.
 
 Covers:
 + dsync/gc.py: entry sanitization & iron rules (FORBIDDEN_LAYOUT_DIRS
-  cleanup-exemption, empty since), cumulative list union, list
+  cleanup-exemption, now empty), cumulative list union, list
   compression, fixed-delay scheduling/reap, state-loss recovery.
 + dsync/ssh-sync.py pull side: delete-list parsing/sanitization,
   anchored exclude patterns, local deletion application (files +
   directory subtrees), idempotent replay, malformed-entry refusal.
-+ fixes (): compression
++ fixes: compression
   non-ingest of forged entries, S1 reap full sanitization vs
   '..'/absolute paths, S2 symlink convergence on both sides, bug2
   dir-entry normalization + type-mismatch convergence.
@@ -127,13 +126,13 @@ check("accept epic-ish paths (no longer an exempt clan)",
       and gc.sanitize_entry("epic.") == "epic.")
 check("accept task/ subtree (ephemeral task dirs stay deletable)",
       gc.sanitize_entry("task/abc123/") == "task/abc123/")
-check("accept bot/ subtree (immortality iron rule removed, task)",
+check("accept bot/ subtree (immortality iron rule removed)",
       gc.sanitize_entry("bot/dispatcher/") == "bot/dispatcher/"
       and gc.sanitize_entry("bot/dispatcher/inbox/x.msg")
       == "bot/dispatcher/inbox/x.msg"
       and gc.sanitize_entry("bot/c1/watcher/alice")
       == "bot/c1/watcher/alice")
-# the BARE clan container is a different thing (task): it names no
+# the BARE clan container is a different thing: it names no
 # participant, so one entry would delete the whole clan
 try:
     gc.sanitize_entry("bot/")
@@ -142,7 +141,7 @@ except gc.GcError:
     _bare_refused = True
 check("refuse the bare bot/ clan container (name a participant instead)",
       _bare_refused and gc.validate_path("bot/") is not None)
-check("accept agent/ subtree (clan dropped from exemption, task)",
+check("accept agent/ subtree (clan dropped from exemption)",
       gc.sanitize_entry("agent/dispatcher/") == "agent/dispatcher/")
 
 print("== add: list creation, cumulativity, compression ==")
@@ -211,7 +210,7 @@ before = gc.existing_lists(ad)
 rc = gc.cmd_add(ws, ad, ["gc/whatever"], delay=60, wait=False)
 check("gc/ self rejected rc=1", rc == 1)
 rc = gc.cmd_add(ws, ad, ["topic/dispatcher/"], delay=60, wait=False)
-check("protected system asset rejected rc=1 (task)", rc == 1)
+check("protected system asset rejected rc=1", rc == 1)
 check("no list written on rejection", gc.existing_lists(ad) == before)
 # ticket./epic./ticket/ clans no longer exempt: acceptance proven on
 # the delete-side section below (is_forbidden_at_delete negative
@@ -229,9 +228,9 @@ check("is_forbidden_at_delete NOT ticket-ish (clan no longer exempt)",
       not gc.is_forbidden_at_delete("ticket.0101-0000-aaaa/x")
       and not gc.is_forbidden_at_delete("epic.e/x")
       and not gc.is_forbidden_at_delete("ticket/abc123/status.json"))
-check("agent/ clan gone: no longer exempt (dropped, task)",
+check("agent/ clan gone: no longer exempt (dropped)",
       not gc.is_forbidden_at_delete("agent/dispatcher/"))
-check("agent/ clan gone: session file no longer exempt (task)",
+check("agent/ clan gone: session file no longer exempt",
       not gc.is_forbidden_at_delete("agent/dispatcher/session.jsonl"))
 check("task/ layout subtree allowed (ephemeral)",
       not gc.is_forbidden_at_delete("task/abc123/"))
@@ -657,8 +656,8 @@ for good in ("bot/dispatcher", "bot/dispatcher/",
           gc.validate_entry(good) is None)
     check(f"bot/ NOT forbidden at delete: {good}",
           not gc.is_forbidden_at_delete(good))
-# ... but the BARE clan container is refused at all three points (task
-#): deletable clan != deletable clan CONTAINER
+# ... but the BARE clan container is refused at all three points:
+# deletable clan != deletable clan CONTAINER
 for bare in ("bot/", "bot"):
     check(f"bare bot/ clan container refused: {bare}",
           gc.validate_path(bare) is not None)
