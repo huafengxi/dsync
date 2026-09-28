@@ -18,7 +18,7 @@ anchors:
 ## 常用命令
 
 ```
-make dav-sync.start/.stop        # WebDAV 双向同步常驻态（服务定义见 env/services.yml）
+make dav-sync.start/.stop        # WebDAV 双向同步常驻态（服务定义见工作区 services/）
 dsync/pikpak.py login            # PikPak 登录、缓存 session（用法细节见 pikpak.md）
 dsync/pikpak.py --help
 ```
