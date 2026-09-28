@@ -207,7 +207,7 @@ FORBIDDEN_LAYOUT_DIRS = ()
 #
 # Live daemon bots (notify-user / heartbeat-loop / dispatcher / domain leads)
 # are DELIBERATELY NOT listed here: their names live in the declaration face
-# svc/bots/, and hard-coding them into this tuple would create a second roster
+# bots/daemon/, and hard-coding them into this tuple would create a second roster
 # to keep in sync by hand. Their deletion guard is behavioural (cleanup tasks
 # skip bot/ by default; deleting a bot needs explicit user authorisation) plus
 # the auditable delete-list ledger. Ruling + re-open triggers:
