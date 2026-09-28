@@ -7,10 +7,10 @@
 +		/* mac-rsync-patch phase 2: under --chown/
 +		 * --groupmap only regular files take the mapped group.  Marking
 +		 * directories (or other non-regular entries) made macOS files
-+		 * created inside inherit the tag via directory group inheritance
++		 * created inside inherit the tag via directory group inheritance,
 +		 * so keep them at the receiver's default group instead. */
 +		if (groupmap && !S_ISREG(file->mode))
-+			file->flags |= FLAG_SKIP_GROUP
++			file->flags |= FLAG_SKIP_GROUP;
  	}
  	if (atimes_ndx && !S_ISDIR(mode))
  		F_ATIME(file) = atime;
@@ -24,7 +24,7 @@
 +			 * the recv_file_entry hunk for the non-inc_recurse path --
 +			 * --chown/--groupmap only marks regular files. */
 +			if (groupmap && !S_ISREG(flist->files[i]->mode))
-+				flist->files[i]->flags |= FLAG_SKIP_GROUP
++				flist->files[i]->flags |= FLAG_SKIP_GROUP;
  		}
  	}
  }

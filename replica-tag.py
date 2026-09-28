@@ -33,9 +33,9 @@ discipline; env/host-id maps hostname -> canonical name):
   ``participant/dispatcher/`` since the legacy top-level dir was
   retired and GC-cleaned):
   - ``inbox/**`` except ``inbox/ack/**``    -> writer = envelope
-    ``from`` resolved to a host (see writer resolution below)
+    ``from`` resolved to a host (see writer resolution below);
     unparseable envelope -> UNKNOWN
-  - ``inbox/ack/**``                        -> the READER writes acks
+  - ``inbox/ack/**``                        -> the READER writes acks;
     the reader is the participant session itself -> participant host
   - anything else (session jsonl, .pi files, ...)
                                             -> participant host
@@ -92,7 +92,7 @@ discipline; env/host-id maps hostname -> canonical name):
   task):
   - ``spec.json``, ``prompt.md``            -> C = spec.createdByHost
   - ``enable.json``                         -> the SCHEDULING side:
-    ``by`` (protocol §14.2) resolvable -> that writer's host
+    ``by`` (protocol §14.2) resolvable -> that writer's host;
     ``agentd-scheduler`` / unresolvable -> hub. The scheduler is a
     single global instance pinned to the hub host (env/services.yml
     ``scheduler.hosts``) and releases tasks on EVERY host
@@ -110,7 +110,7 @@ discipline; env/host-id maps hostname -> canonical name):
   - ``inbox/ack/**``, ``control/ack/**``    -> see the ack rule below
     (flat = H = spec.host, the READER/executor; namespaced = the
     SUBSCRIBER's host)
-  - ``pid.json``, ``pid.log``, ``result.md``, ``report.md``
+  - ``pid.json``, ``pid.log``, ``result.md``, ``report.md``,
     ``progress.md``, ``plan.md``, ``session/**``
                                             -> H (executor products)
   - anything else inside <T>                -> UNKNOWN
@@ -123,7 +123,7 @@ Ack ownership (protocol §4.6 two-state acks): segments after ``ack/`` decide �
   mailbox: ``topic/``) -> the WRITER is the SUBSCRIBER's session, so
   ownership follows the SUBSCRIBER's ``spec.host``, NOT the mailbox's
   owning participant (t-3yp9③). The ack file's own ``subscriber``
-  field is authoritative (protocol §2.2: content beats file names)
+  field is authoritative (protocol §2.2: content beats file names);
   the namespace directory segment is the fallback. The segment is
   ``fsSafeId(participantId)`` (``/`` -> ``.``) and is NOT inverted by
   splitting on dots (names may contain dots, e.g. ``bot/svc.web``):
@@ -143,7 +143,7 @@ ticket field maps to a host as follows, in order:
     mistake the group gate cannot undo)
   - ``topic/<id>``                          -> unknown (a topic is a
     position/shared identity with no host of its own)
-+ ``dispatcher``, ``user``, ``user-im``    -> hub (the dispatcher
++ ``dispatcher``, ``user``, ``user-im``    -> hub (the dispatcher,
   user and IM-bridge sessions all run on the hub)
 + ``agentd``                               -> NOT a fixed host: runner
   terminal notifications (agentd/runner.py notify_tick) are written
@@ -155,7 +155,7 @@ ticket field maps to a host as follows, in order:
   over the whole assistant/ subtree since D8 host-named agents live
   in subdirectories): scan ALL ``.agent`` files under
   ``<workspace>/assistant/`` (any depth) for a ``participant`` field
-  declaring this name; exactly one declarer -> read its ``host``
+  declaring this name; exactly one declarer -> read its ``host``;
   multiple declarers -> conflict warning + fall back to the legacy
   same-name file (see below); no declarer -> fall back to reading the
   ``host`` field of the same-name ``<workspace>/assistant/<name>
@@ -163,7 +163,7 @@ ticket field maps to a host as follows, in order:
   holder's .agent file is named after the participant).
   The host value is a canonical machine name (env/host-id aliases
   normalized through the same table self_host uses). Participant
-  sessions may run on ANY machine (mac-worker runs on mac)
+  sessions may run on ANY machine (mac-worker runs on mac);
   mis-tagging an original as replica lets pull overwrite it. No
   usable host either way -> fall back to hub + warning (legacy
   behavior for participants that never got an .agent file).
@@ -319,7 +319,7 @@ class Ctx:
         self.sub_index = None
         # Declaration scan (phase 2): participant name ->
         # list of (agent file relpath under assistant/, host field or
-        # None) for every .agent declaring that participant. Lazy
+        # None) for every .agent declaring that participant. Lazy,
         # built once on first use.
         self.decl_scan = None
         # Participant names = dirs under participant/ (dispatcher
@@ -470,7 +470,7 @@ class Ctx:
     def ack_owner(self, rel, ack_parts, flat_owner):
         """Owner of an ack file. ``ack_parts`` = the path segments after
         ``ack/``: [<id>] = FLAT ack of a single-subscriber mailbox (the
-        reader = the mailbox's own session -> ``flat_owner``)
+        reader = the mailbox's own session -> ``flat_owner``);
         [<subscriber>, <id>] = NAMESPACED ack of a shared
         multi-subscriber mailbox (protocol §4.6) — the
         writer is the SUBSCRIBER's session, so ownership follows the

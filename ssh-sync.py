@@ -433,7 +433,7 @@ def _gc_report_refusals(refused):
 
 
 def gc_exclude_and_targets(local_dir):
-    """Split delete-list entries into (exclude_patterns, targets
+    """Split delete-list entries into (exclude_patterns, targets,
     refused). exclude_patterns are anchored rsync exclude patterns
     ('/rel' for files, '/rel/' for directory subtrees); targets are
     (relpath, is_dir) for local deletion. THE LIST IS TRUSTED: iron
@@ -441,7 +441,7 @@ def gc_exclude_and_targets(local_dir):
     enforced hub-side ONLY by dsync/gc.py validate_entry (single
     point of generation and validation user
     decision removed the consumer-side duplicate). Entries are refused
-    ONLY when structurally malformed (absolute paths, '..' elements
+    ONLY when structurally malformed (absolute paths, '..' elements,
     glob metacharacters — same defense as the pull protect list, these
     would corrupt rsync pattern semantics) or when they touch ``gc/``
     internals (the sync layer's own gc/ tree is self-managed; the only
@@ -670,7 +670,7 @@ def probe_remote_replica_group(cfg, host):
 
 def unmarked_files(local_dir, replica_gid, excludes=()):
     """(relpaths, ok): regular files of local_dir whose group is NOT
-    replica — the local ORIGINALS. ok=False if the walk hit an error
+    replica — the local ORIGINALS. ok=False if the walk hit an error;
     callers must abort the cycle rather than act on a partial list
     (a truncated pull protect list could expose originals).
     ``excludes`` drops sync-face-excluded names — the

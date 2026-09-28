@@ -38,7 +38,7 @@ macOS 内核凭据只缓存 `kern.ngroups=16` 个补充组（编译期只读常�
 
 - `flist.c` `recv_file_entry`（inc_recurse 默认路径）与 `uidlist.c`
   `recv_id_list`（老协议全量路径）：在组映射落 `file->flags` 处，若
-  `groupmap` 非空（即用户用了 --chown 组部分/--groupmap）且条目非正规文件
+  `groupmap` 非空（即用户用了 --chown 组部分/--groupmap）且条目非正规文件，
   置 `FLAG_SKIP_GROUP`。
 - 效果复用上游既有抑制机制：`rsync.c` `set_file_attrs` 的 change_gid 与
   `generator.c` 的组差异比较都检查该标志——目录/符号链接等**既不 chgrp、也
@@ -67,13 +67,13 @@ macOS 内核凭据只缓存 `kern.ngroups=16` 个补充组（编译期只读常�
 2. `brew tap local/mac-rsync`（已 tap 则跳过）。
 3. 卸载官方 rsync bottle（`brew uninstall --ignore-dependencies rsync`）。
 4. `brew install --build-from-source alice/mac-rsync/rsync`（源码编译进
-   `/opt/homebrew/Cellar/rsync/3.5.0/`，与官方包同一 Cellar 路径
+   `/opt/homebrew/Cellar/rsync/3.5.0/`，与官方包同一 Cellar 路径，
    `/opt/homebrew/bin/rsync` 链接关系不变）。
 5. `brew pin rsync`（防止未来 `brew upgrade` 用官方 bottle 覆盖；升级见下）。
 6. 冒烟验证 `--chown=:replica`（文件 gid=502；目录不标，见下）。
 
-安装后核对：`brew info rsync` 应显示 `From: <tap 路径>`
-`rsync --debug=OWN3` 传输时应打印 `process has 18 gids: ... 502 ...`
+安装后核对：`brew info rsync` 应显示 `From: <tap 路径>`；
+`rsync --debug=OWN3` 传输时应打印 `process has 18 gids: ... 502 ...`；
 二期行为：传输含目录的树后 `ls -ln` 目标——常规文件 gid=502、目录/符号链接
 保持接收进程默认组（如 ~/ 下新建为 20/staff）；对同一目标重复 `rsync -ai`
 应零输出（目录无组差异条目）。
@@ -87,7 +87,7 @@ macOS 内核凭据只缓存 `kern.ngroups=16` 个补充组（编译期只读常�
      `.patch` 文件为唯一事实源且保持一期在前、二期在后，`install.sh` 会自动
      同步进 tap）。
    - 套不上 → 一期看上游 `uidlist.c` `is_in_group` 是否已改用
-     `getgrouplist`（本补丁的意图上游可能已自行修复）；已修 → 删掉补丁块
+     `getgrouplist`（本补丁的意图上游可能已自行修复）；已修 → 删掉补丁块；
      未修 → 手工 rebase。二期看上游接收端组映射点（`flist.c`
      `recv_file_entry` 的 preserve_gid 块、`uidlist.c` `recv_id_list` 循环）
      是否已变化；rebase 后更新对应 `.patch` 与 `__END__` 数据段。
@@ -110,7 +110,7 @@ rsync -a --chown=:replica /tmp/rs/src/ /tmp/rs/dst/ --debug=OWN3
 stat -f 'gid=%g group=%Sg' /tmp/rs/dst/f.txt      # 期望 gid=502 group=replica
 ```
 
-一期补丁前（官方包）：`process has 16 gids`（无 502），落盘 `gid=0`
+一期补丁前（官方包）：`process has 16 gids`（无 502），落盘 `gid=0`；
 一期补丁后：`process has 18 gids`（含 502），落盘 `gid=502`。
 
 二期验证（在 $HOME 下建夹具，避开 /tmp 新建目录落 wheel 组的系统怪癖）：

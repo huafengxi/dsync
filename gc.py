@@ -26,9 +26,9 @@ Layout
   to all nodes by the existing link. Each list is FULL & CUMULATIVE:
   it contains every currently-pending path (set semantics, naturally
   idempotent) so any node can converge from any single surviving list.
-  Entry syntax (relative to ``agents/``): a plain path = one file
+  Entry syntax (relative to ``agents/``): a plain path = one file;
   a path with a trailing ``/`` = a directory subtree.
-+ ``run/gc/state.json``  — hub-local deletion schedule (gitignored
++ ``run/gc/state.json``  — hub-local deletion schedule (gitignored,
   never synced): which hub copies still need deleting and when. The
   lists are the AUTHORITY and the state is a cache of the plan, so a
   lost or reset state never widens or shrinks the deletion surface —
@@ -42,14 +42,14 @@ Layout
 Semantics
 =========
 ``add``:
-  1. validates every path (see the iron rules below)
+  1. validates every path (see the iron rules below);
   2. writes ``agents/gc/delete-list.<seq>`` atomically (tmp+rename):
      union of all surviving lists' entries ∪ the new paths ∪ the OLD
      list files themselves (LIST COMPRESSION — a new list schedules the
      deletion of its predecessors, so only the latest authoritative
-     list survives long-term)
+     list survives long-term);
   3. schedules the hub-local deletion of the new paths AND of the old
-     list files at ``now + --delay``
+     list files at ``now + --delay``;
   4. with ``--wait``, blocks until the batch is due and performs the
      hub-local deletion before returning; without it the deletion is
      performed by the next ``add`` (which always reaps due entries
@@ -82,43 +82,43 @@ redundant layer):
   ``topic/`` — the bot/ immortality iron rule was REMOVED by user
   decision 2026-09-06; ``FORBIDDEN_LAYOUT_DIRS`` is now
   empty (the exemption machinery and the audited --force bypass below
-  stay in place should a future exempt clan be listed)
-  ``task/`` remains deletable — task dirs are ephemeral
+  stay in place should a future exempt clan be listed);
+  ``task/`` remains deletable — task dirs are ephemeral;
   ``topic/`` (collaboration containers) is likewise
-  deletable — topic dirs are ephemeral collaboration records
+  deletable — topic dirs are ephemeral collaboration records;
 
   EXCEPTION — the AUDITED FORCE BYPASS (2026-08-31 user
   decision): ``add --force`` accepts cleanup-exempt entries, but every
   such entry is stored WITH AN INLINE AUDIT MARKER
   ``<path> #FORCED:by=<who>[,task=<id>],host=<host>,ts=<UTC>`` so the
   ledger answers "who forced what when" at a glance. The marker lifts
-  ONLY the exemption rule above — gc/ self-tree, absolute paths
+  ONLY the exemption rule above — gc/ self-tree, absolute paths,
   '..' traversal and glob metacharacters stay refused under --force.
   Read/compression and reap pass marked entries through (a legitimate
   forced entry must survive list compression; the consumer applies the
-  PATH part as-is and ignores the marker — marking is hub-side audit
+  PATH part as-is and ignores the marker — marking is hub-side audit,
   not a consumer-side gate). Only ``add`` ever creates markers.
   Tradeoff, documented: a forged list could plant a forged marker and
   ride compression — accepted because (a) planting a list on a node
   that gets pushed to the hub already means a compromised node, and
-  (b) the marker pins provenance for after-the-fact audit
+  (b) the marker pins provenance for after-the-fact audit;
 + paths inside ``gc/`` itself are never accepted via CLI (GC manages
   its own directory — list compression is the only internal path
   scheduling), so retiring a list file is a ledger operation that only
   ``add``'s compression step authorizes: no list content, whatever seq
-  it claims, can schedule the deletion of a surviving list
-+ a deletion must name a CONCRETE PARTICIPANT directory (``task/<id>/``
+  it claims, can schedule the deletion of a surviving list;
++ a deletion must name a CONCRETE PARTICIPANT directory (``task/<id>/``,
   ``bot/<name>/``, ``topic/<id>/``): a bare family container
   (``agents/``, ``task/``, ``bot/``, ``topic/``, ``run/``) names no
-  participant and is refused — one such line would delete a whole clan
+  participant and is refused — one such line would delete a whole clan,
   and because the lists are cumulative and append-only it would sit in
   the ledger forever, deleting any same-named subtree the moment it
   appears. Refused like the tree-root and ``gc/`` guards, i.e. the
-  audited ``--force`` bypass does NOT lift it
+  audited ``--force`` bypass does NOT lift it;
 + absolute paths, ``..`` elements and glob metacharacters are refused.
 
 The read/compression filter (review finding B1) matters because a
-FORGED delete-list planted on any node can reach the hub via push
+FORGED delete-list planted on any node can reach the hub via push;
 ``add``'s compression step would otherwise ingest its entries
 unvalidated and poison every future authoritative list. The same
 filter guards ``reap``'s schedule, so a tampered run/gc/state.json
@@ -195,7 +195,7 @@ FORBIDDEN_LAYOUT_DIRS = ()
 # session subscribes to it via watcher/): losing it loses every task
 # notification. Refused at any depth EVEN with the audited --force
 # bypass — un-protecting means editing this tuple (a reviewed code
-# change), not passing a CLI flag. Paths are relative to agents/
+# change), not passing a CLI flag. Paths are relative to agents/,
 # prefix-matched on path elements ("topic/dispatcher" also protects
 # "topic/dispatcher/inbox/x.msg").
 # Cross-reference: the agentd side keeps the same list as
@@ -439,7 +439,7 @@ def read_entries(agents_dir):
     supersedes an unmarked duplicate.
 
     Illegal entries are dropped here (so they cannot ride compression
-    into the next authoritative list) and reported as ONE summary line
+    into the next authoritative list) and reported as ONE summary line,
     not one line per entry — and the same pollution is reported only
     ONCE PER INVOCATION: every ``reap``/``add``/``list`` re-reads all
     surviving lists (``list`` reads them twice), so a polluted ledger
