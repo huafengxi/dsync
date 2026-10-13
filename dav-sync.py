@@ -78,7 +78,6 @@ Usage:
 """
 
 import argparse
-import io
 import os
 import re
 import shutil
@@ -239,9 +238,7 @@ def _upload_to_webdav(dav, local_path, remote_path):
     """Upload a local file to WebDAV."""
     try:
         with open(local_path, "rb") as f:
-            data = f.read()
-        buffer = io.BytesIO(data)
-        dav.upload_fileobj(buffer, remote_path, overwrite=True)
+            dav.upload_fileobj(f, remote_path, overwrite=True)
         return True
     except Exception as e:
         print(f"Upload error {remote_path}: {e}", file=sys.stderr)
