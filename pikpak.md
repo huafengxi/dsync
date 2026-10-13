@@ -28,7 +28,7 @@ hard error at import time that names the key and this file.
 - All other commands reuse the cached session; on token expiry they
   auto-refresh and retry. Run `login` explicitly only once, or to force a
   fresh login.
-- PikPak **disabled the plain password grant** ("currently not supported"),
+- PikPak disabled the plain password grant ("currently not supported"),
   so login goes through the shield-captcha flow (`/v1/shield/captcha/init` +
   `/v1/auth/signin`). Normally init hands back a captcha_token directly; if
   it returns a slider URL instead, solve it in a browser, then:
@@ -50,15 +50,15 @@ reachable directly. So the CLI splits traffic:
   `http://127.0.0.1:7897`; mihomo pins PikPak domains to the SG node).
   `SOCKS_PROXY`/`HTTPS_PROXY` env vars work
   too, but `PIKPAK_PROXY` takes precedence.
-- **Content downloads** go **direct** (bypasses proxy env vars), saving
+- **Content downloads** go direct (bypasses proxy env vars), saving
   proxy bandwidth; measured ~8x faster than tunneling from this host.
   Direct falls back to proxy automatically on failure; set
   `PIKPAK_DL_PROXY=1` to force content through the proxy.
 
 ## Download speed
 
-- `link`/`download` use **CACHE mode** (`usage=CACHE` media link) instead of
-  FETCH: links stay valid **~24h** (vs ~5-10 min), so multi-GB downloads
+- `link`/`download` use CACHE mode (`usage=CACHE` media link) instead of
+  FETCH: links stay valid ~24h (vs ~5-10 min), so multi-GB downloads
   can't die mid-transfer. The `expire=` in the URL confirms this.
 - `download` fetches with parallel HTTP Range chunks
   (`--threads N`, default 8, `$PIKPAK_THREADS`).
@@ -75,7 +75,7 @@ reachable directly. So the CLI splits traffic:
 - Uses PikPak's resumable upload: sha1 dedup ("instant" when the content
   already exists), then a signed PUT to the Aliyun OSS bucket PikPak
   returns. Files above `$PIKPAK_MULTIPART_MB` (default 100) use hand-rolled
-  OSS **multipart** upload (32 MiB parts, 3 retries/part, ~312 GiB max), so
+  OSS multipart upload (32 MiB parts, 3 retries/part, ~312 GiB max), so
   the old 5 GB single-PUT limit is gone.
 
 ## Platform
